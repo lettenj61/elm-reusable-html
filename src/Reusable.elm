@@ -2,7 +2,7 @@ module Reusable exposing
     ( CustomTag
     , Tag
     , extend
-    , wrap
+    , wrap, wrapDeep
     )
 
 import Html exposing (..)
@@ -91,6 +91,43 @@ wrap  (wrapper, wrapperAttrs ) tag =
     \attributes children ->
         wrapper wrapperAttrs
             [tag attributes children]
+
+
+{-| `wrapDeep` plants resulting view of given `tag` into deeply nested structure.
+
+The first element in given `outerNodes` list would come topmost.
+
+    postItem : Tag msg
+    postItem =
+        p
+            |> extend [ class "post-item" ]
+            |> wrapDeep
+                [ ( div, [ class "post-wrapper" ] )
+                , ( article, [ class "post-body" ] )
+                ]
+
+    postItem [] [ text "New blog!" ]
+        ==  """
+            <div class="post-wrapper">
+                <article class="post-body">
+                    <p class="post-item">New blog!</p>
+                </article>
+            </div>
+            """
+-}
+wrapDeep : List ( Tag msg, List (Attribute msg) ) -> Tag msg -> Tag msg
+wrapDeep outerNodes tag =
+    wrapDeepHelp (List.reverse outerNodes) tag
+
+
+wrapDeepHelp : List ( Tag msg, List (Attribute msg) ) -> Tag msg -> Tag msg
+wrapDeepHelp outerNodes tag =
+    case outerNodes of
+        [] ->
+            tag
+
+        pair :: rest ->
+            wrapDeepHelp rest <| wrap pair tag
 
 
 itWorks : Tag msg
