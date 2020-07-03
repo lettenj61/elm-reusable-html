@@ -5,8 +5,18 @@ module Reusable exposing
     , wrap, wrapDeep
     )
 
-import Html exposing (..)
+{-| Minimal reusable functions to enrich common use of elm/html.
 
+# Types
+@docs CustomTag, Tag
+
+# Utilities
+@docs extend, wrap, wrapDeep
+
+-}
+
+
+import Html exposing (Attribute, Html)
 
 
 -- TAGS
@@ -128,8 +138,3 @@ wrapDeepHelp outerNodes tag =
 
         pair :: rest ->
             wrapDeepHelp rest <| wrap pair tag
-
-
-itWorks : Tag msg
-itWorks =
-    span |> wrap ( div, [] )
