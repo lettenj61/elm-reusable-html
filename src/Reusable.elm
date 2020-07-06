@@ -28,7 +28,7 @@ This is merely an synonym for those values reside in `elm/html`,
 which you must be already familiar with.
 
 You can use this to make a little statement about
-what type does your custom function would accept as child node.
+what type does your custom view function would accept as child node.
 
     type alias CardProp msg =
         { title : String
@@ -49,7 +49,7 @@ type alias CustomTag children msg =
 
 {-| The fundamental function type that constructs `Html` from `List` of `Attribute`s and `Html`s.
 
-Frankly, this package is all about defining your own `Tag` types, with as fewer keystrokes as possible.
+Frankly, this package is all about defining your own `Tag msg` values, with as fewer keystrokes as possible.
 
     import Html exposing (..)
 
@@ -87,7 +87,7 @@ extend defaults tag =
     wrapper : Tag msg
     wrapper =
         span
-            |> wrap ( div, [ class "wrapper" ] )
+            |> wrap (div [ class "wrapper" ])
 
     wrapper [] [ text "in depth" ]
         ==  """
@@ -96,11 +96,10 @@ extend defaults tag =
             </div>
             """
 -}
-wrap : ( Tag msg, List (Attribute msg) ) -> Tag msg -> Tag msg
-wrap  (wrapper, wrapperAttrs ) tag =
+wrap : (List (Html msg) -> Html msg) -> Tag msg -> Tag msg
+wrap wrapper tag =
     \attributes children ->
-        wrapper wrapperAttrs
-            [tag attributes children]
+        wrapper [tag attributes children]
 
 
 {-| `wrapDeep` plants resulting view of given `tag` into deeply nested structure.
@@ -112,8 +111,8 @@ The first element in given `outerNodes` list would come topmost.
         p
             |> extend [ class "post-item" ]
             |> wrapDeep
-                [ ( div, [ class "post-wrapper" ] )
-                , ( article, [ class "post-body" ] )
+                [ (div [ class "post-wrapper" ])
+                , (article [ class "post-body" ])
                 ]
 
     postItem [] [ text "New blog!" ]
@@ -125,16 +124,16 @@ The first element in given `outerNodes` list would come topmost.
             </div>
             """
 -}
-wrapDeep : List ( Tag msg, List (Attribute msg) ) -> Tag msg -> Tag msg
-wrapDeep outerNodes tag =
-    wrapDeepHelp (List.reverse outerNodes) tag
+wrapDeep : List (List (Html msg) -> Html msg) -> Tag msg -> Tag msg
+wrapDeep wrappers tag =
+    wrapDeepHelp (List.reverse wrappers) tag
 
 
-wrapDeepHelp : List ( Tag msg, List (Attribute msg) ) -> Tag msg -> Tag msg
-wrapDeepHelp outerNodes tag =
-    case outerNodes of
+wrapDeepHelp : List (List (Html msg) -> Html msg) -> Tag msg -> Tag msg
+wrapDeepHelp wrappers tag =
+    case wrappers of
         [] ->
             tag
 
-        pair :: rest ->
-            wrapDeepHelp rest <| wrap pair tag
+        wrapper :: rest ->
+            wrapDeepHelp rest <| wrap wrapper tag

@@ -26,7 +26,7 @@ import Reusable exposing (Tag)
 -- You'll have an `a` anchor wrapped in `li`
 bcAnchor : Tag msg
 bcAnchor =
-   Reusable.wrap ( li, [] ) a
+   Reusable.wrap ( li [] ) a
 
 -- This `ul` always have default `class`
 bcList : Tag msg
@@ -44,9 +44,17 @@ breadcrumb props =
       props
 ```
 
+
+## Version changes
+
+Basically there are no big feature changes between `1.0.0` and `2.0.0`, but `2.0.0` has more clearer APIs. 
+
+Please consider that `2.0.0` was the initial release and ignore `1.0.0`.
+
+
 ## License
 
 This library is licensed under either of:
 
-- MIT
 - Apache 2.0
+- MIT
